@@ -1,0 +1,5 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,continuous_pickup,continuous_drop_off
+1001,1001,16,Dubrovnik-Plat,,3,https://www.libertasdubrovnik.hr/linija/36/dubrovnik-plat-16,FF6B4D,FFFFFF,,,
+1002,1001,16A,Dubrovnik-Srebreno,,3,https://www.libertasdubrovnik.hr/linija/37/dubrovnik-srebreno-16a,A6180E,FFFFFF,,,
+1003,1001,23,Dubrovnik-Buići,,3,https://www.libertasdubrovnik.hr/linija/38/dubrovnik-buici-23,FB3199,FFFFFF,,,
+1004,1001,23A,Dubac-Brgat-Srebreno,,3,https://www.libertasdubrovnik.hr/linija/39/dubac-brgat-srebreno-23a,FFB530,FFFFFF,,,

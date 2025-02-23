@@ -14,19 +14,19 @@ export interface Calendar {
     // Indicates whether the service operates on all Mondays in the date range specified by the start_date and end_date fields.
     // 1 - Service is available for all Mondays in the date range.
     // 0 - Service is not available for Mondays in the date range.
-    monday: 0 | 1;
+    monday: number;
     // Functions in the same way as monday except applies to Tuesdays
-    tuesday: 0 | 1;
+    tuesday: number;
     // Functions in the same way as monday except applies to Wednesdays
-    wednesday: 0 | 1;
+    wednesday: number;
     // Functions in the same way as monday except applies to Thursdays
-    thursday: 0 | 1;
+    thursday: number;
     // Functions in the same way as monday except applies to Fridays
-    friday: 0 | 1;
+    friday: number;
     // Functions in the same way as monday except applies to Saturdays.
-    saturday: 0 | 1;
+    saturday: number;
     // Functions in the same way as monday except applies to Sundays.
-    sunday: 0 | 1;
+    sunday: number;
     startDate: Date;
     endDate: Date;
 }
@@ -37,7 +37,7 @@ export interface CalendarDate {
     // Indicates whether service is available on the date specified in the date field. 
     // 1 - Service has been added for the specified date.
     // 2 - Service has been removed for the specified date.
-    exceptionType: 1 | 2;
+    exceptionType: number;
 }
 
 export interface Route {
@@ -48,17 +48,17 @@ export interface Route {
     routeDesc?: string;
     // Indicates the type of transportation used on a route.
     // See valid options: https://gtfs.org/documentation/schedule/reference/#routestxt
-    routeType: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 11 | 12;
-    routeUrl?: string;
+    routeType: number;
+    routeUrl?: URL;
     routeColor?: string;
     routeTextColor?: string;
     routeSortOrder?: number;
     // Indicates that the rider can board the transit vehicle at any point along the vehicle’s travel path.
     // See valid options: https://gtfs.org/documentation/schedule/reference/#routestxt
-    continuousPickup?: 0 | 1 | 2 | 3;
+    continuousPickup?: number;
     // Indicates that the rider can alight from the transit vehicle at any point along the vehicle’s travel path.
     // See valid options: https://gtfs.org/documentation/schedule/reference/#routestxt
-    continuousDropOff?: 0 | 1 | 2 | 3;
+    continuousDropOff?: number;
     networkId?: string;
 }
 
@@ -71,13 +71,13 @@ export interface Stop {
     stopLat?: number;
     stopLon?: number;
     zoneId?: string;
-    stopUrl?: string;
+    stopUrl?: URL;
     // See valid options: https://gtfs.org/documentation/schedule/reference/#stopstxt
-    locationType?: 0 | 1 | 2 | 3 | 4;
+    locationType?: number;
     parentStation?: string;
     stopTimezone?: string;
     // See valid options: https://gtfs.org/documentation/schedule/reference/#stopstxt
-    wheelchairBoarding?: 0 | 1 | 2;
+    wheelchairBoarding?: number;
     levelId?: string;
     platformCode?: string;
 }
@@ -91,19 +91,19 @@ export interface Trip {
     // Indicates the direction of travel for a trip.
     // 0 - Travel in one direction (e.g. outbound travel).
     // 1 - Travel in the opposite direction (e.g. inbound travel).
-    directionId?: 0 | 1;
+    directionId?: number;
     blockId?: string;
     shapeId?: string;
     // See valid options: https://gtfs.org/documentation/schedule/reference/#tripstxt
-    wheelchairAccessible?: 0 | 1 | 2;
+    wheelchairAccessible?: number;
     // See valid options: https://gtfs.org/documentation/schedule/reference/#tripstxt
-    bikesAllowed?: 0 | 1 | 2;
+    bikesAllowed?: number;
 }
 
 export interface StopTime {
     tripId: string;
-    arrivalTime?: string;
-    departureTime?: string;
+    arrivalTime?: Date;
+    departureTime?: Date;
     stopId: string;
     locationGroupId?: string;
     locationId?: string;
@@ -111,15 +111,15 @@ export interface StopTime {
     stopHeadsign?: string;
     startPickupDropOffWindow?: string;
     endPickupDropOffWindow?: string;
-    pickupType?: 0 | 1 | 2 | 3;
-    dropOffType?: 0 | 1 | 2 | 3;
-    continuousPickup?: 0 | 1 | 2 | 3;
-    continuousDropOff?: 0 | 1 | 2 | 3;
+    pickupType?: number;
+    dropOffType?: number;
+    continuousPickup?: number;
+    continuousDropOff?: number;
     shapeDistTraveled?: number;
     // Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. 
     // 0 - Times are considered approximate. 
     // 1 - Times are considered exact.
-    timepoint?: 0 | 1;
+    timepoint?: number;
 }
   
 export interface GTFSData {

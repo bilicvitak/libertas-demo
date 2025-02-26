@@ -2,39 +2,47 @@ import { GTFSData, StopTime } from "./models";
 
 /**
  * Finds trips that include both the selected start and end stops.
- * Handles circular trips where the start and end stops are the same.
+ * Supports both circular and non-circular trips.
  */
 export function findTripsWithStartAndEndStops(
   startStopId: string,
   endStopId: string,
   gtfsData: GTFSData
 ): string[] {
+  // Find all trips that include the selected start stop (where stop sequence is 10)
   const tripsWithStartStop = gtfsData.stopTimes
     .filter(stopTime => stopTime.stopId === startStopId && stopTime.stopSequence === 10)
     .map(stopTime => stopTime.tripId);
 
+  // Find all trips that include the selected end stop
   const tripsWithEndStop = gtfsData.stopTimes
     .filter(stopTime => stopTime.stopId === endStopId)
     .map(stopTime => stopTime.tripId);
 
   // Find intersection of trips that include both start and end stops
-  let tripsWithStartAndEnd: string[];
+  const tripsWithStartAndEnd = tripsWithStartStop.filter(tripId => tripsWithEndStop.includes(tripId));
 
-  if (startStopId === endStopId) {
-    // Handle circular trips (start and end stops are the same)
-    tripsWithStartAndEnd = tripsWithStartStop.filter(tripId => {
-      const tripStops = gtfsData.stopTimes.filter(stopTime => stopTime.tripId === tripId);
+  // Filter trips based on whether they are circular or non-circular
+  const validTrips = tripsWithStartAndEnd.filter(tripId => {
+    const tripStops = gtfsData.stopTimes.filter(stopTime => stopTime.tripId === tripId);
+
+    if (startStopId === endStopId) {
+      // Handle circular trips (start and end stops are the same)
       const firstStop = tripStops.find(stopTime => stopTime.stopSequence === 10);
       const lastStop = tripStops.reduce((prev, curr) => (curr.stopSequence > prev.stopSequence ? curr : prev));
 
-      return firstStop?.stopId === lastStop?.stopId; // Check if the trip is circular
-    });
-  } else {
-    // Handle non-circular trips (start and end stops are different)
-    tripsWithStartAndEnd = tripsWithStartStop.filter(tripId => tripsWithEndStop.includes(tripId));
-  }
+      // For circular trips, the start and end stops must be the same, and the trip must include the start/end stop
+      return firstStop?.stopId === lastStop?.stopId && firstStop?.stopId === startStopId;
+    } else {
+      // Handle non-circular trips (start and end stops are different)
+      const lastStop = tripStops.reduce((prev, curr) => (curr.stopSequence > prev.stopSequence ? curr : prev));
 
-  return tripsWithStartAndEnd;
+      // For non-circular trips, the end stop must be the last stop in the trip
+      return lastStop.stopId === endStopId;
+    }
+  });
+
+  return validTrips;
 }
 
 /**

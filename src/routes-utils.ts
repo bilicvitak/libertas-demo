@@ -33,12 +33,19 @@ export async function calculateAndDisplayRouteWithWaypoints(
     stopover: true,
   }));
 
+  // Check if the number of waypoints exceeds the API limit
+  if (waypoints.length > 25) {
+    //window.alert("This trip has too many stops to display the full route. Only the first 25 intermediate stops will be shown.");
+    waypoints.splice(25); // Limit the waypoints to 25
+  }
+
   directionsService
     .route({
       origin: origin,
       destination: destination,
       waypoints: waypoints,
       travelMode: google.maps.TravelMode.DRIVING,
+      optimizeWaypoints: true, // Optimize the order of waypoints for the shortest route
     })
     .then((response) => {
       directionsRenderer.setDirections(response);

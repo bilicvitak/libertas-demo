@@ -1,6 +1,7 @@
 import { extractStartStops, filterEndStopsBasedOnStartStop, populateSelectList } from "./src/stops-utils";
 import { fetchGTFSData } from "./src/gtfs-service";
 import { findTripsWithStartAndEndStops, extractDepartureTimes, populateDepartureTimeSelectList } from "./src/departure-utils";
+import { calculateAndDisplayRouteWithWaypoints } from "./src/routes-utils";
 import { GTFSData } from "./src/models";
 
 async function initMap(): Promise<void> {
@@ -10,7 +11,7 @@ async function initMap(): Promise<void> {
     document.getElementById("map") as HTMLElement,
     {
       zoom: 14,
-      center: { lat: 42.6627120110896, lng: 18.0836206312485 },
+      center: { lat: 42.662712, lng: 18.083620 },
     }
   );
 
@@ -40,7 +41,7 @@ async function initMap(): Promise<void> {
   // Populate the end stop select list with a placeholder
   populateSelectList(endSelect, [], "Select an end stop");
 
-  // Populate the departure time select list with a placeholder
+  // Populate the departure time list with a placeholder
   populateDepartureTimeSelectList(departureTimeSelect, [], "Select a departure time");
 
   // Handle start stop selection change
@@ -92,51 +93,34 @@ async function initMap(): Promise<void> {
   });
 
   // Handle departure time selection change
-  departureTimeSelect.addEventListener("change", () => {
+  departureTimeSelect.addEventListener("change", async () => {
     const selectedTripId = departureTimeSelect.value;
 
+    console.log(selectedTripId);
+
     if (selectedTripId) {
-      // You can use the selectedTripId for further processing if needed
-      console.log("Selected Trip ID:", selectedTripId);
+      try {
+        // Fetch all stops for the selected trip
+        const tripStops = gtfsData.stopTimes
+          .filter(stopTime => stopTime.tripId === selectedTripId)
+          .sort((a, b) => a.stopSequence - b.stopSequence);
+
+        // Extract stop IDs
+        const stopIds = tripStops.map(stopTime => stopTime.stopId);
+
+        // Calculate and display the route with all stops as waypoints
+        await calculateAndDisplayRouteWithWaypoints(
+          directionsService,
+          directionsRenderer,
+          stopIds,
+          gtfsData
+        );
+      } catch (error) {
+        console.error("Failed to calculate route:", error);
+        window.alert("Failed to calculate route. Please check the console for details.");
+      }
     }
   });
-}
-
-function calculateAndDisplayRoute(
-  directionsService: google.maps.DirectionsService,
-  directionsRenderer: google.maps.DirectionsRenderer
-) {
-  const startSelect = document.getElementById("start") as HTMLSelectElement;
-  const endSelect = document.getElementById("end") as HTMLSelectElement;
-
-  const startStopId = startSelect.value;
-  const endStopId = endSelect.value;
-
-  if (!startStopId || !endStopId) {
-    window.alert("Please select both a start and end stop.");
-    return;
-  }
-
-  const startStopName = startSelect.options[startSelect.selectedIndex].text;
-  const endStopName = endSelect.options[endSelect.selectedIndex].text;
-
-  directionsService
-    .route({
-      origin: {
-        query: startStopName,
-      },
-      destination: {
-        query: endStopName,
-      },
-      travelMode: google.maps.TravelMode.DRIVING,
-    })
-    .then((response) => {
-      directionsRenderer.setDirections(response);
-    })
-    .catch((e) => {
-      console.error("Directions request failed:", e);
-      window.alert("Directions request failed. Please check the console for details.");
-    });
 }
 
 declare global {

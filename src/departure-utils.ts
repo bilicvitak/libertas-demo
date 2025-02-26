@@ -2,6 +2,7 @@ import { GTFSData, StopTime } from "./models";
 
 /**
  * Finds trips that include both the selected start and end stops.
+ * Handles circular trips where the start and end stops are the same.
  */
 export function findTripsWithStartAndEndStops(
   startStopId: string,
@@ -17,7 +18,21 @@ export function findTripsWithStartAndEndStops(
     .map(stopTime => stopTime.tripId);
 
   // Find intersection of trips that include both start and end stops
-  const tripsWithStartAndEnd = tripsWithStartStop.filter(tripId => tripsWithEndStop.includes(tripId));
+  let tripsWithStartAndEnd: string[];
+
+  if (startStopId === endStopId) {
+    // Handle circular trips (start and end stops are the same)
+    tripsWithStartAndEnd = tripsWithStartStop.filter(tripId => {
+      const tripStops = gtfsData.stopTimes.filter(stopTime => stopTime.tripId === tripId);
+      const firstStop = tripStops.find(stopTime => stopTime.stopSequence === 10);
+      const lastStop = tripStops.reduce((prev, curr) => (curr.stopSequence > prev.stopSequence ? curr : prev));
+
+      return firstStop?.stopId === lastStop?.stopId; // Check if the trip is circular
+    });
+  } else {
+    // Handle non-circular trips (start and end stops are different)
+    tripsWithStartAndEnd = tripsWithStartStop.filter(tripId => tripsWithEndStop.includes(tripId));
+  }
 
   return tripsWithStartAndEnd;
 }
